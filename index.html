@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dossiers ENBF</title>
+<title>Registre — Vente de Moto</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Georgia&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -14,10 +14,6 @@
   header.top{ background:var(--petrol); color:var(--paper); padding:26px 24px 22px; border-bottom:4px solid var(--amber); }
   header.top h1{ margin:0; font-size:1.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; }
   header.top p{ margin:6px 0 0; font-size:0.85rem; color:#D9E4DF; font-family:Georgia,serif; font-style:italic; }
-  .enbf-logo3d{ margin:0; display:inline-flex; gap:.08em; font-family:'Oswald','Arial Narrow',sans-serif; font-weight:700; font-size:4.2rem; line-height:1; letter-spacing:0.01em; }
-  .enbf-logo3d span{ display:inline-block; }
-  .enbf-logo3d .e,.enbf-logo3d .b{ color:#6FA8DC; text-shadow:1px 1px 0 #3D6FA0,2px 2px 0 #3D6FA0,3px 3px 0 #2A4E75,4px 4px 0 #2A4E75,5px 5px 0 #1B3550,6px 6px 8px rgba(0,0,0,.45); }
-  .enbf-logo3d .n,.enbf-logo3d .f{ color:#E3A15C; text-shadow:1px 1px 0 #B87833,2px 2px 0 #B87833,3px 3px 0 #8C591E,4px 4px 0 #8C591E,5px 5px 0 #613D12,6px 6px 8px rgba(0,0,0,.45); }
   nav.tabs{ display:flex; gap:2px; background:var(--petrol-dark); padding:0 20px; overflow-x:auto; }
   nav.tabs button{ background:transparent; border:none; color:#BFD3CC; padding:13px 18px; font-size:0.82rem; font-weight:600; text-transform:uppercase; cursor:pointer; border-bottom:3px solid transparent; white-space:nowrap; }
   nav.tabs button.active{ color:#fff; border-bottom-color:var(--amber); }
@@ -150,17 +146,16 @@
 .rapport-kpi-item b{ display:block; font-size:13px; margin-top:2px; }
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <header class="top">
-  <h1 class="enbf-logo3d"><span class="e">E</span><span class="n">N</span><span class="b">B</span><span class="f">F</span></h1>
+  <h1>Vente de Moto — Registre</h1>
   <p>Commandes, ventes &amp; gestion CMC</p>
 </header>
 <div class="ad-banner">
   <div class="ad-banner-inner">
-    <span class="ad-banner-text">Ets NIKIEMA Boukaré &amp; Frères</span>
-    <span class="ad-banner-text">Ets NIKIEMA Boukaré &amp; Frères</span>
+    <span class="ad-banner-text">LKD Services and Travel</span>
+    <span class="ad-banner-text">LKD Services and Travel</span>
   </div>
 </div>
 <div class="ad-images-banner">
@@ -501,7 +496,6 @@
 
       <div class="btn-row" style="margin-bottom:14px;">
         <button type="button" class="action" id="rptPrintBtn">🖨️ Imprimer le rapport (paysage)</button>
-        <button type="button" class="action" id="rptExcelBtn">📥 Exporter en Excel</button>
       </div>
 
       <!-- TABLE ENTRÉES -->
@@ -568,12 +562,6 @@ const localStore = {
 // ===== ÉTAT =====
 let motos=[],fournisseurs=[],revendeurs=[],paiements=[],registreFilter="tous";
 function fmt(n){return Number(n||0).toLocaleString("fr-FR");}
-function fmtDate(d){
-  if(!d || d==="—") return "—";
-  const p=String(d).split("-");
-  if(p.length!==3) return d;
-  return `${p[2]}/${p[1]}/${p[0]}`;
-}
 
 // ===== CONVERSION NOMBRE -> LETTRES (français) =====
 function nombreEnLettres(nombre){
@@ -641,7 +629,7 @@ async function saveRevendeurs(){await localStore.set("moto_revendeurs",JSON.stri
 async function savePaiements(){await localStore.set("moto_paiements",JSON.stringify(paiements));await driveSaveToDrive();}
 
 // ===== GOOGLE DRIVE =====
-const GOOGLE_CLIENT_ID="689844417125-4nv6iknju1m0ut344o3fdedfpiu20t8n.apps.googleusercontent.com-";
+const GOOGLE_CLIENT_ID="940251544354-56f3g55nbk6mcv0elr0g4mgq5ospmgm1.apps.googleusercontent.com";
 const DRIVE_SCOPE="https://www.googleapis.com/auth/drive.file";
 const DRIVE_FILENAME="gestion_motos_registre.json";
 let driveTokenClient=null,driveAccessToken=null,driveFileId=null,driveSyncing=false;
@@ -741,7 +729,7 @@ function renderDashboard(){
   ].map(c=>`<div class="card ${c.cls}"><div class="label">${c.label}</div><div class="value">${c.value}</div></div>`).join("");
   const recentes=vendues.slice().sort((a,b)=>(b.dateVente||"").localeCompare(a.dateVente||"")).slice(0,8);
   const head=`<tr><th>Date</th><th>Moto</th><th>N° Série</th><th>Client</th><th>Type</th><th class="num">Prix</th><th></th></tr>`;
-  const body=recentes.map(m=>`<tr><td>${fmtDate(m.dateVente)}</td><td>${m.marque} ${m.modele}</td><td><span class="plate">${m.numSerie}</span></td><td>${m.nomClient||"—"}</td><td>${m.typeClient||"—"}</td><td class="num">${fmt(m.prixVente)}</td><td><button class="linklike" data-vedit="${m.id}">✏️ Modifier</button></td></tr>`).join("");
+  const body=recentes.map(m=>`<tr><td>${m.dateVente||"—"}</td><td>${m.marque} ${m.modele}</td><td><span class="plate">${m.numSerie}</span></td><td>${m.nomClient||"—"}</td><td>${m.typeClient||"—"}</td><td class="num">${fmt(m.prixVente)}</td><td><button class="linklike" data-vedit="${m.id}">✏️ Modifier</button></td></tr>`).join("");
   document.getElementById("dashVentesTable").innerHTML=recentes.length?head+body:`<tr><td class="empty">Aucune vente enregistrée.</td></tr>`;
   document.querySelectorAll("[data-vedit]").forEach(btn=>{
     btn.onclick=()=>{ editVente(btn.dataset.vedit); };
@@ -751,7 +739,7 @@ function renderDashboard(){
 function renderVenteTable(){
   const vendues=motos.filter(m=>m.vendu).slice().sort((a,b)=>(b.dateVente||"").localeCompare(a.dateVente||""));
   const head=`<tr><th>Date</th><th>Moto</th><th>N° Série</th><th>Client</th><th>Type</th><th class="num">Prix</th><th></th></tr>`;
-  const body=vendues.map(m=>`<tr><td>${fmtDate(m.dateVente)}</td><td>${m.marque} ${m.modele}</td><td><span class="plate">${m.numSerie}</span></td><td>${m.nomClient||"—"}</td><td>${m.typeClient||"—"}</td><td class="num">${fmt(m.prixVente)}</td><td><button class="linklike" data-vedit3="${m.id}">✏️ Modifier</button>${m.typeClient==="Client ordinaire"?` <button class="linklike" data-vfacture2="${m.id}">🖨️ Facture</button>`:""}</td></tr>`).join("");
+  const body=vendues.map(m=>`<tr><td>${m.dateVente||"—"}</td><td>${m.marque} ${m.modele}</td><td><span class="plate">${m.numSerie}</span></td><td>${m.nomClient||"—"}</td><td>${m.typeClient||"—"}</td><td class="num">${fmt(m.prixVente)}</td><td><button class="linklike" data-vedit3="${m.id}">✏️ Modifier</button>${m.typeClient==="Client ordinaire"?` <button class="linklike" data-vfacture2="${m.id}">🖨️ Facture</button>`:""}</td></tr>`).join("");
   document.getElementById("venteTable").innerHTML=vendues.length?head+body:`<tr><td class="empty">Aucune vente enregistrée.</td></tr>`;
   document.querySelectorAll("[data-vedit3]").forEach(btn=>{
     btn.onclick=()=>{ editVente(btn.dataset.vedit3); };
@@ -806,7 +794,7 @@ function renderRevendeursTable(){
 
 function renderCmcTable(){
   const head=`<tr><th>Moto</th><th>N° Série</th><th>Arrivée CMC</th><th>Provenance</th><th>N° Décl.</th><th>Date Décl.</th><th>Récupération</th><th>Par</th><th>N° Immatriculation</th><th>Arrivée carte grise</th><th>Statut</th></tr>`;
-  const body=motos.slice().reverse().map(m=>`<tr><td>${m.marque} ${m.modele}</td><td><span class="plate">${m.numSerie}</span></td><td>${fmtDate(m.dateArriveeCMC)}</td><td>${m.provenanceCMC||"—"}</td><td>${m.numDeclaration||"—"}</td><td>${fmtDate(m.dateDeclaration)}</td><td>${fmtDate(m.dateRecuperationCMC)}</td><td>${m.nomRecuperateur?(m.nomRecuperateur+(m.telRecuperateur?" ("+m.telRecuperateur+")":"")):"—"}</td><td>${m.numImmatriculation?`<span class="plate">${m.numImmatriculation}</span>`:"—"}</td><td>${fmtDate(m.dateArriveeCarteGrise)}</td><td>${m.dateRecuperationCMC?'<span class="badge done">Récupérée</span>':'<span class="badge pending">CMC en attente d\'être récupéré</span>'}</td></tr>`).join("");
+  const body=motos.slice().reverse().map(m=>`<tr><td>${m.marque} ${m.modele}</td><td><span class="plate">${m.numSerie}</span></td><td>${m.dateArriveeCMC||"—"}</td><td>${m.provenanceCMC||"—"}</td><td>${m.numDeclaration||"—"}</td><td>${m.dateDeclaration||"—"}</td><td>${m.dateRecuperationCMC||"—"}</td><td>${m.nomRecuperateur?(m.nomRecuperateur+(m.telRecuperateur?" ("+m.telRecuperateur+")":"")):"—"}</td><td>${m.numImmatriculation?`<span class="plate">${m.numImmatriculation}</span>`:"—"}</td><td>${m.dateArriveeCarteGrise||"—"}</td><td>${m.dateRecuperationCMC?'<span class="badge done">Récupérée</span>':'<span class="badge pending">CMC en attente d\'être récupéré</span>'}</td></tr>`).join("");
   document.getElementById("cmcTable").innerHTML=motos.length?head+body:`<tr><td class="empty">Aucune moto enregistrée.</td></tr>`;
 }
 
@@ -821,10 +809,10 @@ function renderRegistre(){
     <td>${m.marque}</td><td>${m.modele}</td><td><span class="plate">${m.numSerie}</span></td>
     <td class="num">${m.prixAchat?fmt(m.prixAchat):"—"}</td>
     <td>${m.provenanceCMC||"—"}</td>
-    <td>${m.numDeclaration||"—"}</td><td>${fmtDate(m.dateDeclaration)}</td>
+    <td>${m.numDeclaration||"—"}</td><td>${m.dateDeclaration||"—"}</td>
     <td>${m.dateArriveeCMC?'<span class="badge done">CMC arrivé</span>':'<span class="badge pending">CMC en attente</span>'}</td>
     <td>${m.vendu?'<span class="badge vendu">Vendue</span>':'<span class="badge stock">En stock</span>'}</td>
-    <td>${m.nomClient||"—"}</td><td>${fmtDate(m.dateImmat)}</td><td class="num">${m.vendu?fmt(m.prixVente):"—"}</td>
+    <td>${m.nomClient||"—"}</td><td>${m.dateImmat||"—"}</td><td class="num">${m.vendu?fmt(m.prixVente):"—"}</td>
     <td>
       <button class="linklike" data-medit="${m.id}">✏️</button> &nbsp;
       ${m.vendu?`<button class="linklike" data-vedit2="${m.id}">✏️ Vente</button> &nbsp; <button class="linklike" style="color:var(--red-soft)" data-vannuler="${m.id}">✕ Annuler vente</button> &nbsp;`:""}
@@ -861,7 +849,7 @@ function renderCommandesGroupees(){
   const head=`<tr><th>Référence CMD</th><th>Date CMD</th><th>Détail motos</th><th class="num">Prix total</th><th>Fournisseur</th></tr>`;
   const body=groupes.map(g=>{
     const detail=Object.entries(g.items).map(([k,n])=>`${n} ${k}`).join("; ");
-    return `<tr><td>${g.referenceCommande}</td><td>${fmtDate(g.dateEnregistrement)}</td><td>${detail}</td><td class="num">${fmt(g.total)}</td><td>${g.fournisseur}</td></tr>`;
+    return `<tr><td>${g.referenceCommande}</td><td>${g.dateEnregistrement}</td><td>${detail}</td><td class="num">${fmt(g.total)}</td><td>${g.fournisseur}</td></tr>`;
   }).join("");
   document.getElementById("commandesGroupeesTable").innerHTML=groupes.length?head+body:`<tr><td class="empty">Aucune commande enregistrée.</td></tr>`;
 }
@@ -886,7 +874,7 @@ function renderPaiementFournisseurInfo(){
   const headC=`<tr><th>Référence CMD</th><th>Date CMD</th><th>Détail motos</th><th class="num">Prix total</th></tr>`;
   const bodyC=groupes.map(g=>{
     const detail=Object.entries(g.items).map(([k,n])=>`${n} ${k}`).join("; ");
-    return `<tr><td>${g.referenceCommande}</td><td>${fmtDate(g.dateEnregistrement)}</td><td>${detail}</td><td class="num">${fmt(g.total)}</td></tr>`;
+    return `<tr><td>${g.referenceCommande}</td><td>${g.dateEnregistrement}</td><td>${detail}</td><td class="num">${fmt(g.total)}</td></tr>`;
   }).join("");
   document.getElementById("commandesFournisseurTable").innerHTML=groupes.length?headC+bodyC:`<tr><td class="empty">Aucune commande pour ce fournisseur.</td></tr>`;
   const headH=`<tr><th>Date de paiement</th><th class="num">Montant</th></tr>`;
@@ -1113,13 +1101,13 @@ setupAutocomplete("venteSerieSearch","venteAcList","venteMotoId","venteMotoCible
       <div class="fiche-row"><span class="fiche-label">Marque / Modèle</span><span class="fiche-val">${m.marque} ${m.modele}</span></div>
       <div class="fiche-row"><span class="fiche-label">N° Série</span><span class="fiche-val"><span class="plate">${m.numSerie}</span></span></div>
       <div class="fiche-row"><span class="fiche-label">Provenance / Fournisseur</span><span class="fiche-val">${m.provenanceCMC||"—"}</span></div>
-      <div class="fiche-row"><span class="fiche-label">Date arrivée CMC</span><span class="fiche-val">${fmtDate(m.dateArriveeCMC)}</span></div>
+      <div class="fiche-row"><span class="fiche-label">Date arrivée CMC</span><span class="fiche-val">${m.dateArriveeCMC||"—"}</span></div>
       <div class="fiche-row"><span class="fiche-label">Statut vente</span><span class="fiche-val ${m.vendu?'warn':'ok'}">${m.vendu?"Vendue le "+m.dateVente:"En stock"}</span></div>
       <div class="fiche-row"><span class="fiche-label">Revendeur</span><span class="fiche-val">${revendeurInfo}</span></div>
-      <div class="fiche-row"><span class="fiche-label">Récupération CMC</span><span class="fiche-val ${m.dateRecuperationCMC?'ok':'pending'}">${m.dateRecuperationCMC?"Récupérée le "+fmtDate(m.dateRecuperationCMC):"Non récupérée"}</span></div>
+      <div class="fiche-row"><span class="fiche-label">Récupération CMC</span><span class="fiche-val ${m.dateRecuperationCMC?'ok':'pending'}">${m.dateRecuperationCMC?"Récupérée le "+m.dateRecuperationCMC:"Non récupérée"}</span></div>
       <div class="fiche-row"><span class="fiche-label">Récupérateur</span><span class="fiche-val">${m.nomRecuperateur||(m.dateRecuperationCMC?"—":"Non renseigné")}${m.telRecuperateur?" — "+m.telRecuperateur:""}</span></div>
       <div class="fiche-row"><span class="fiche-label">N° Immatriculation</span><span class="fiche-val">${m.numImmatriculation||"Non renseigné"}</span></div>
-      <div class="fiche-row"><span class="fiche-label">Date arrivée carte grise</span><span class="fiche-val ${m.dateArriveeCarteGrise?'ok':'pending'}">${m.dateArriveeCarteGrise?fmtDate(m.dateArriveeCarteGrise):"Non renseignée"}</span></div>`;
+      <div class="fiche-row"><span class="fiche-label">Date arrivée carte grise</span><span class="fiche-val ${m.dateArriveeCarteGrise?'ok':'pending'}">${m.dateArriveeCarteGrise||"Non renseignée"}</span></div>`;
     document.getElementById("cmcFicheWrap").style.display="block";
     if(m.dateRecuperationCMC)document.getElementById("cmcDate").value=m.dateRecuperationCMC;
     if(m.nomRecuperateur)document.getElementById("cmcNom").value=m.nomRecuperateur;
@@ -1227,7 +1215,7 @@ function rechercherCommandes(){
   const head=`<tr><th>Référence commande</th><th>Date d'enregistrement</th><th>Marque</th><th>Modèle</th><th>N° Série</th><th>Fournisseur</th><th class="num">Prix achat</th><th>Statut CMC</th></tr>`;
   const body=list.map(m=>`<tr>
     <td>${m.referenceCommande||"—"}</td>
-    <td>${fmtDate(m.dateEnregistrement)}</td>
+    <td>${m.dateEnregistrement||"—"}</td>
     <td>${m.marque}</td><td>${m.modele}</td>
     <td><span class="plate">${m.numSerie}</span></td>
     <td>${m.provenanceCMC||"—"}</td>
@@ -1339,7 +1327,7 @@ document.getElementById("formCmc").addEventListener("submit",async(e)=>{
       }
       if(cgRempli){
         ficheRows[8].querySelector(".fiche-val").textContent=numImmatriculation;
-        ficheRows[9].querySelector(".fiche-val").textContent=fmtDate(dateArriveeCarteGrise);
+        ficheRows[9].querySelector(".fiche-val").textContent=dateArriveeCarteGrise;
         ficheRows[9].querySelector(".fiche-val").className="fiche-val ok";
       }
     }
@@ -1434,7 +1422,7 @@ document.getElementById("formRevendeur").addEventListener("submit",async(e)=>{
     if(!results.length){ list.style.display="none"; return; }
     list.innerHTML = results.map(m => `<div data-id="${m.id}">
       <div class="ac-serie">${m.numSerie}</div>
-      <div class="ac-info">${m.marque} ${m.modele} — Client : ${m.nomClient||"—"} — ${m.dateVente?fmtDate(m.dateVente):""}</div>
+      <div class="ac-info">${m.marque} ${m.modele} — Client : ${m.nomClient||"—"} — ${m.dateVente||""}</div>
     </div>`).join("");
     list.style.display = "block";
     list.querySelectorAll("div[data-id]").forEach(row => {
@@ -1581,7 +1569,7 @@ document.getElementById("rapportBtn").addEventListener("click", () => {
     .map(m => {
       const marge = Number(m.prixVente||0) - Number(m.prixAchat||0);
       return `<tr>
-        <td>${fmtDate(m.dateVente)}</td>
+        <td>${m.dateVente||"—"}</td>
         <td>${m.marque} ${m.modele}</td>
         <td><span class="plate">${m.numSerie}</span></td>
         <td class="num">${m.prixAchat ? fmt(m.prixAchat) : "—"}</td>
@@ -1589,7 +1577,7 @@ document.getElementById("rapportBtn").addEventListener("click", () => {
         <td class="num" style="color:${marge>=0?'var(--petrol-dark)':'var(--red-soft)'}">${fmt(marge)}</td>
         <td>${m.nomClient||"—"}</td>
         <td>${m.typeClient||"—"}</td>
-        <td>${fmtDate(m.dateImmat)}</td>
+        <td>${m.dateImmat||"—"}</td>
       </tr>`;
     }).join("");
 
@@ -1640,13 +1628,13 @@ document.getElementById("rptBtn").addEventListener("click", () => {
     const bodyE = entrees
       .slice().sort((a,b)=>(b.dateEnregistrement||"").localeCompare(a.dateEnregistrement||""))
       .map(m=>`<tr>
-        <td>${fmtDate(m.dateEnregistrement)}</td>
+        <td>${m.dateEnregistrement||"—"}</td>
         <td>${m.marque}</td>
         <td>${m.modele}</td>
         <td><span class="plate">${m.numSerie}</span></td>
         <td>${m.provenanceCMC||"—"}</td>
         <td>${m.numDeclaration||"—"}</td>
-        <td>${fmtDate(m.dateDeclaration)}</td>
+        <td>${m.dateDeclaration||"—"}</td>
         <td class="num">${m.prixAchat ? fmt(m.prixAchat)+" FCFA" : "—"}</td>
       </tr>`).join("");
     document.getElementById("rptEntreesTable").innerHTML = headE + bodyE;
@@ -1683,14 +1671,14 @@ document.getElementById("rptBtn").addEventListener("click", () => {
       .map(m=>{
         const marge = Number(m.prixVente||0) - Number(m.prixAchat||0);
         return `<tr>
-          <td>${fmtDate(m.dateVente)}</td>
+          <td>${m.dateVente||"—"}</td>
           <td>${m.marque}</td>
           <td>${m.modele}</td>
           <td><span class="plate">${m.numSerie}</span></td>
           <td>${m.nomClient||"—"}</td>
           <td><span class="badge ${m.typeClient==="Revendeur"?"vendu":"stock"}">${m.typeClient||"—"}</span></td>
           <td>${m.telClient||"—"}</td>
-          <td>${fmtDate(m.dateImmat)}</td>
+          <td>${m.dateImmat||"—"}</td>
           <td class="num">${m.prixAchat ? fmt(m.prixAchat) : "—"}</td>
           <td class="num">${fmt(m.prixVente)}</td>
           <td class="num" style="color:${marge>=0?"var(--petrol-dark)":"var(--red-soft)"};font-weight:bold;">${fmt(marge)}</td>
@@ -1725,7 +1713,7 @@ function facturesHTML(m){
       <img class="facture-header-img" src="data:image/png;base64,${ENTETE_IMG_B64}">
       <div class="facture-titre">
         <h2>FACTURE</h2>
-        <div>N° Série : ${m.numSerie}<br>Date : ${fmtDate(m.dateVente)}</div>
+        <div>N° Série : ${m.numSerie}<br>Date : ${m.dateVente||"—"}</div>
       </div>
       <div class="facture-client">
         <div><b>Client :</b> ${m.nomClient||"—"}</div>
@@ -1785,71 +1773,6 @@ function imprimerRapport(){
   window.print();
 }
 document.getElementById("rptPrintBtn").addEventListener("click", imprimerRapport);
-
-// ===== EXPORT EXCEL DU RAPPORT =====
-function exporterRapportExcel(){
-  const du = document.getElementById("rptDu").value;
-  const au = document.getElementById("rptAu").value;
-  if(!du || !au){ alert("Veuillez d'abord afficher un rapport (saisir les deux dates et cliquer sur \"Afficher le rapport\")."); return; }
-
-  const entrees = motos.filter(m => m.dateEnregistrement && m.dateEnregistrement >= du && m.dateEnregistrement <= au)
-    .slice().sort((a,b)=>(b.dateEnregistrement||"").localeCompare(a.dateEnregistrement||""));
-
-  const sorties = motos.filter(m => m.vendu && m.dateVente && m.dateVente >= du && m.dateVente <= au)
-    .slice().sort((a,b)=>(b.dateVente||"").localeCompare(a.dateVente||""));
-
-  const entreesRows = entrees.map(m => ({
-    "Date enregistrement": fmtDate(m.dateEnregistrement),
-    "Marque": m.marque || "",
-    "Modèle": m.modele || "",
-    "N° Série": m.numSerie || "",
-    "Fournisseur": m.provenanceCMC || "",
-    "N° Déclaration": m.numDeclaration || "",
-    "Date Déclaration": fmtDate(m.dateDeclaration),
-    "Prix achat (FCFA)": Number(m.prixAchat || 0)
-  }));
-
-  const sortiesRows = sorties.map(m => ({
-    "Date vente": fmtDate(m.dateVente),
-    "Marque": m.marque || "",
-    "Modèle": m.modele || "",
-    "N° Série": m.numSerie || "",
-    "Client / Revendeur": m.nomClient || "",
-    "Type": m.typeClient || "",
-    "Téléphone": m.telClient || "",
-    "Date Immat.": fmtDate(m.dateImmat),
-    "Prix achat (FCFA)": Number(m.prixAchat || 0),
-    "Prix vente (FCFA)": Number(m.prixVente || 0),
-    "Marge (FCFA)": Number(m.prixVente || 0) - Number(m.prixAchat || 0)
-  }));
-
-  const wb = XLSX.utils.book_new();
-
-  const wsEntrees = entreesRows.length ? XLSX.utils.json_to_sheet(entreesRows) : XLSX.utils.aoa_to_sheet([["Aucune entrée sur cette période"]]);
-  XLSX.utils.book_append_sheet(wb, wsEntrees, "Entrées");
-
-  const wsSorties = sortiesRows.length ? XLSX.utils.json_to_sheet(sortiesRows) : XLSX.utils.aoa_to_sheet([["Aucune sortie sur cette période"]]);
-  XLSX.utils.book_append_sheet(wb, wsSorties, "Sorties");
-
-  const caTotal = sorties.reduce((s,m)=>s+Number(m.prixVente||0),0);
-  const achatTotalSorties = sorties.reduce((s,m)=>s+Number(m.prixAchat||0),0);
-  const achatTotalEntrees = entrees.reduce((s,m)=>s+Number(m.prixAchat||0),0);
-  const wsResume = XLSX.utils.aoa_to_sheet([
-    ["Rapport de gestion — Ets NIKIEMA Boukaré & Frères"],
-    ["Période", `du ${fmtDate(du)} au ${fmtDate(au)}`],
-    [],
-    ["Motos entrées", entrees.length],
-    ["Coût total achat (entrées)", achatTotalEntrees],
-    [],
-    ["Motos vendues", sorties.length],
-    ["Chiffre d'affaires total", caTotal],
-    ["Marge brute", caTotal - achatTotalSorties]
-  ]);
-  XLSX.utils.book_append_sheet(wb, wsResume, "Résumé");
-
-  XLSX.writeFile(wb, `rapport_${du}_au_${au}.xlsx`);
-}
-document.getElementById("rptExcelBtn").addEventListener("click", exporterRapportExcel);
 
 window.addEventListener("afterprint", () => {
   document.body.classList.remove("printing-facture");
